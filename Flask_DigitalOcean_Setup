@@ -1,0 +1,137 @@
+# https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-18-04
+# https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-18-04
+# https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-uswgi-and-nginx-on-ubuntu-18-04
+# https://www.digitalocean.com/community/questions/flask-nginx-uwsgi-ubuntu-tutorial
+# https://www.digitalocean.com/community/questions/how-to-check-error-logs-for-flask-uwsgi-nginx-app
+
+# https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt-get update
+sudo apt-get install python3.6
+sudo apt-get install python3.6-venv
+
+sudo apt-get install -y python3-dev
+
+sudo apt-get update (before installing certbot)
+
+cd ~/abupower
+source abupowerenv/bin/activate
+pip3 list (to check)
+python3.6 `app.py` (to test)
+deactivate
+
+sudo systemctl restart nginx
+sudo systemctl status nginx
+sudo systemctl status abupower
+sudo tail -30 /var/log/nginx/error.log
+Move single file: mv app.py flaskapp.py
+Copy linux directory (with files inside): `cp -r abupower/ abupower_backup/`
+Debug: sudo nano /var/log/syslog
+Add permissions for cron: sudo chmod 755 file.py
+
+
+python `appname.py` to test
+pip3 install flask-restful (etc etc)
+
+## FileZilla
+Host: sftp://<ip-address>
+Username: <user>
+Password: <pw>
+Port: 22
+
+Conclusion
+In this guide, you created and secured a simple Flask application within a Python virtual environment. 
+You created a WSGI entry point so that any WSGI-capable application server can interface with it, and then configured the uWSGI app server to provide this function. 
+Afterwards, you created a systemd service file to automatically launch the application server on boot. You also created an Nginx server block that passes web client 
+traffic to the application server, relaying external requests, and secured traffic to your server with Let's Encrypt.
+
+Flask is a very simple, but extremely flexible framework meant to provide your applications with functionality without being too restrictive about structure and design. 
+You can use the general stack described in this guide to serve the flask applications that you design.
+
+# https://flask-restful.readthedocs.io/en/latest/
+
+___________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+# https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-16-04
+
+sudo -i -u postgres
+psql
+CREATE TABLE active_products_historical( primary_ids SERIAL PRIMARY KEY, active_product_nick VARCHAR(255) NOT NULL, active_product_titles VARCHAR(255) NOT NULL, active_product_ids BIGSERIAL NOT NULL, active_product_prices FLOAT NOT NULL, active_product_cat_names VARCHAR(255) NOT NULL, active_product_cat_ids INT NOT NULL, active_product_img_thumb VARCHAR(255) NOT NULL, active_product_img_url VARCHAR(255) NOT NULL, active_product_lst_type VARCHAR(255) NOT NULL, active_product_watch_count INT NOT NULL, active_product_con VARCHAR(255) NOT NULL, active_product_loc VARCHAR(255) NOT NULL, active_product_start VARCHAR(255) NOT NULL, active_product_end VARCHAR(255) NOT NULL, active_product_depth INT NOT NULL, timestamp timestamp default current_timestamp);
+COPY active_products(primary_ids, active_product_nick, active_product_titles, active_product_ids, active_product_prices, active_product_cat_names, active_product_cat_ids, active_product_img_thumb, active_product_img_url, active_product_lst_type, active_product_watch_count, active_product_con, active_product_loc, active_product_start, active_product_end, active_product_depth, timestamp)
+FROM '/home/coopes/abupower/backup_csvs/active_products.csv' DELIMITER ',' CSV;
+
+CREATE TABLE completed_products( primary_ids SERIAL PRIMARY KEY, completed_product_nick VARCHAR(255) NOT NULL, completed_product_titles VARCHAR(255) NOT NULL, completed_product_ids BIGSERIAL NOT NULL UNIQUE, completed_product_prices FLOAT NOT NULL, completed_product_cat_names VARCHAR(255) NOT NULL, completed_product_cat_ids INT NOT NULL, completed_product_img_thumb VARCHAR(255) NOT NULL, completed_product_img_url VARCHAR(255) NOT NULL, completed_product_lst_type VARCHAR(255) NOT NULL, completed_product_con VARCHAR(255) NOT NULL, completed_product_loc VARCHAR(255) NOT NULL, completed_product_start VARCHAR(255) NOT NULL, completed_product_end VARCHAR(255) NOT NULL, timestamp timestamp default current_timestamp, completed_product_depth INT NOT NULL);
+COPY completed_products(primary_ids, completed_product_nick, completed_product_titles, completed_product_ids, completed_product_prices, completed_product_cat_names, completed_product_cat_ids, completed_product_img_thumb, completed_product_img_url, completed_product_lst_type, completed_product_con, completed_product_loc, completed_product_start, completed_product_end, timestamp, completed_product_depth)
+FROM '/home/coopes/abupower/backup_csvs/completed_products.csv' DELIMITER ',' CSV;
+
+CREATE TABLE production_completed_products_stats( primary_ids SERIAL PRIMARY KEY, completed_product_nick VARCHAR(255), completed_product_avg FLOAT, completed_product_min FLOAT, completed_product_max FLOAT, completed_product_depth INT, completed_product_avg_length FLOAT, completed_product_sum FLOAT, timestamp timestamp default current_timestamp);
+COPY production_completed_products_stats( primary_ids, completed_product_nick, completed_product_avg, completed_product_min, completed_product_max, completed_product_depth, completed_product_avg_length, completed_product_sum, timestamp)
+FROM '/home/coopes/abupower/backup_csvs/production_completed_products_stats.csv' DELIMITER ',' CSV;
+
+CREATE TABLE production_completed_products_index( primary_ids SERIAL PRIMARY KEY, completed_product_set_name VARCHAR(255), completed_product_set_id INT, completed_product_index_avg FLOAT, completed_product_index_min FLOAT , completed_product_index_max FLOAT, completed_product_index_length_avg FLOAT , completed_product_index_count_sum INT, completed_product_index_sum FLOAT, timestamp timestamp default current_timestamp);
+COPY production_completed_products_index( primary_ids, completed_product_set_name, completed_product_set_id, completed_product_index_avg, completed_product_index_min, completed_product_index_max, completed_product_index_length_avg, completed_product_index_count_sum, completed_product_index_sum, timestamp)
+FROM '/home/coopes/abupower/backup_csvs/production_completed_products_index.csv' DELIMITER ',' CSV;
+
+CREATE TABLE production_active_products_stats( primary_ids SERIAL PRIMARY KEY, active_product_nick VARCHAR(255), active_product_avg FLOAT, active_product_min FLOAT, active_product_max FLOAT, active_product_depth INT, active_product_avg_length FLOAT, active_product_sum FLOAT, timestamp timestamp default current_timestamp);
+COPY production_active_products_stats( primary_ids, active_product_nick, active_product_avg, active_product_min, active_product_max, active_product_depth, active_product_avg_length, active_product_sum, timestamp)
+FROM '/home/coopes/abupower/backup_csvs/production_active_products_stats.csv' DELIMITER ',' CSV;
+
+CREATE TABLE production_active_products_index( primary_ids SERIAL PRIMARY KEY, active_product_set_name VARCHAR(255), active_product_set_id INT, active_product_index_avg FLOAT, active_product_index_min FLOAT , active_product_index_max FLOAT, active_product_index_length_avg FLOAT , active_product_index_count_sum INT, active_product_index_sum FLOAT, timestamp timestamp default current_timestamp);
+COPY production_active_products_index( primary_ids, active_product_set_name, active_product_set_id, active_product_index_avg, active_product_index_min, active_product_index_max, active_product_index_length_avg, active_product_index_count_sum, active_product_index_sum, timestamp)
+FROM '/home/coopes/abupower/backup_csvs/production_active_products_index.csv' DELIMITER ',' CSV;
+
+-- What is the result?
+SELECT MAX(primary_ids) FROM production_completed_products_index;
+SELECT MAX(primary_ids) FROM production_completed_products_stats;
+SELECT MAX(primary_ids) FROM production_active_products_stats;
+SELECT MAX(primary_ids) FROM production_active_products_stats;
+-- Then run...
+-- This should be higher than the last result.
+SELECT nextval('production_completed_products_index_primary_ids_seq');
+SELECT nextval('production_completed_products_stats_primary_ids_seq');
+SELECT nextval('production_active_products_index_primary_ids_seq');
+SELECT nextval('production_active_products_stats_primary_ids_seq');
+-- If it's not higher... run this set the sequence last to your highest id. 
+-- (wise to run a quick pg_dump first...)
+BEGIN;
+-- protect against concurrent inserts while you update the counter
+LOCK TABLE production_completed_products_index IN EXCLUSIVE MODE;
+LOCK TABLE production_completed_products_stats IN EXCLUSIVE MODE;
+LOCK TABLE production_active_products_index IN EXCLUSIVE MODE;
+LOCK TABLE production_active_products_stats IN EXCLUSIVE MODE;
+-- Update the sequence
+SELECT setval('production_completed_products_index_primary_ids_seq', COALESCE((SELECT MAX(primary_ids)+1 FROM production_completed_products_index), 1), false);
+SELECT setval('production_active_products_index_primary_ids_seq', COALESCE((SELECT MAX(primary_ids)+1 FROM production_active_products_index), 1), false);
+SELECT setval('production_completed_products_stats_primary_ids_seq', COALESCE((SELECT MAX(primary_ids)+1 FROM production_completed_products_stats), 1), false);
+SELECT setval('production_active_products_stats_primary_ids_seq', COALESCE((SELECT MAX(primary_ids)+1 FROM production_active_products_stats), 1), false);
+COMMIT;
+
+SELECT MAX(primary_ids) FROM active_products_historical;
+SELECT nextval('active_products_historical_primary_ids_seq');
+BEGIN;
+LOCK TABLE active_products_historical IN EXCLUSIVE MODE;
+SELECT setval('active_products_historical_primary_ids_seq', COALESCE((SELECT MAX(primary_ids)+1 FROM active_products_historical), 1), false);
+COMMIT;
+
+# automatic trigger to move rows-to-be-truncated to a seperate, historical table
+"""
+CREATE FUNCTION moveDeleted() RETURNS trigger AS $$
+    BEGIN
+       INSERT INTO active_products_historical VALUES((OLD).*);
+       RETURN OLD;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER moveDeleted
+BEFORE DELETE ON active_products
+FOR EACH ROW
+EXECUTE PROCEDURE moveDeleted();
+"""
+
+# delete the function, if need be
+DROP FUNCTION moveDeleted() CASCADE;
+
+tail -f cronlog.txt
+1 5 * * * /home/coopes/abupower/abupowerenv/bin/python /home/coopes/abupower/test.py >> /home/coopes/abupower/cronlog.txt ; /home/coopes/abupower/abupowerenv/bin/python /home/coopes/abupower/test2.py >> /home/coopes/abupower/cronlog.txt 2>&1
+# The 2>&1 just redirects Channel 2 (Standard Error) and Channel 1 (Standard Output) to the same place which in this context is Channel 1 (Standard Output), and thence your log file.
+If all output from a cron is redirected to a file, it will not generate an email of the output to Stdout or Stderr.
