@@ -1,0 +1,52 @@
+# https://reactjs.org/tutorial/tutorial.html
+# https://reactjs.org/docs/create-a-new-react-app.html#create-react-app
+# https://medium.com/@Preda/getting-started-on-building-a-personal-website-with-react-b44ee93b1710
+# https://medium.com/@Preda/semantic-ui-for-good-looking-looking-elements-5e6645787e99
+
+### Create React App
+# Create React App doesn’t handle backend logic or databases; it just creates a frontend build pipeline, so you can use it with any backend you want. Under the hood, it uses Babel and webpack, but you don’t need to know anything about them.
+# When you’re ready to deploy to production, running npm run build will create an optimized build of your app in the build folder. You can learn more about Create React App from its README and the User Guide.
+npx create-react-app my-app
+cd my-app
+npm start
+--------------------------------------------------
+# check node version
+node -v
+# check npm version
+npm -v
+
+### Vue CLI 
+# Similar to Create React App, although the feature set is slightly different
+npm install -g @vue/cli
+vue --version
+# if you need to install globally (for bash)
+npm install -g @vue/cli-init
+vue init webpack git-deploy-template
+cd git-deplay-template
+npm install
+npm run dev
+# get sass for vue
+npm install -D sass-loader node-sass
+
+/////////////////////////
+npm init
+npm install -g nodemon
+npm install express --save
+npm install body-parser --save
+npm install react --save
+npm install react-dom --save
+npm install react-router-dom --save
+npm install react-router --save
+### Creating a webpack
+# As a developer, it is best practice to keep our code modular and separate for better organisation and ease of navigation. 
+# It is also more readable and easier for other developers to follow our code. In contrast however, the web browser prefers 
+# fewer files in order to read our code and render it to the view. Webpack is a tool that combines our separate code files 
+# into one called a “bundle” file which the browser can then interpret.
+npm install webpack --save
+# Install babel dependencies.
+# Babel compiles code written in ES6 to ES5 so that all browsers can interpret the JavaScript code correctly.
+npm install babel-core --save
+npm install babel-loader --save
+npm install babel-preset-es2015 --save
+npm install babel-preset-react --save
+npm install --save body-parser
